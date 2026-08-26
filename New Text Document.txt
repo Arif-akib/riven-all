@@ -1,2 +1,22 @@
 discount and shipping coupon rules create
 place order
+
+
+work done  admin end 
+1.category 
+    create 
+    update 
+    status off 
+    search frontend not api based
+
+2.sub category 
+    create 
+    update 
+    status off 
+    search frontend not api based
+
+3.use 
+    create 
+    update 
+    status off 
+    search frontend not api based

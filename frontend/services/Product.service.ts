@@ -17,6 +17,7 @@ export const getProductList = async ({
   category,
   brand,
   onsale,
+  isNew,
   sort,
 }: GetProductListParams = {}): Promise<ProductListResponse> => {
   try {
@@ -35,6 +36,10 @@ export const getProductList = async ({
 
     if (onsale !== undefined) {
       params.append("onsale", String(onsale));
+    }
+
+    if (isNew !== undefined) {
+      params.append("newArrival", String(isNew));
     }
 
     if (sort) {

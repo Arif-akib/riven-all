@@ -8,29 +8,32 @@ import Trending from "@/components/Home/Trending";
 import USP from "@/components/Home/Usp";
 
 import {
-  getBrandList,
-  getCategoryList,
+  // getBrandList,
+  // getCategoryList,
   getHeroSliders,
   getOfferList,
   getProductList,
   getReviewList,
   getTrendingList,
+  getOnsaleList
 } from "@/services/Home.service";
 
 export default async function HomePage() {
   const [
     heroSlider,
-    categoryList,
+    // categoryList,
+    onSale,
     productList,
-    brandList,
+    // brandList,
     trendingList,
     offerList,
     reviewList,
   ] = await Promise.all([
     getHeroSliders(),
-    getCategoryList(),
+    // getCategoryList(),
+    getOnsaleList(),
     getProductList(),
-    getBrandList(),
+    // getBrandList(),
     getTrendingList(),
     getOfferList(),
     getReviewList(),
@@ -42,11 +45,11 @@ export default async function HomePage() {
 
       <USP />
 
-      <HomeCategory data={categoryList} />
+      <HomeCategory data={onSale} />
 
       <HomeProduct data={productList} />
 
-      <HomeBrand data={brandList} />
+      {/* <HomeBrand data={brandList} /> */}
 
       <Trending data={trendingList} />
 

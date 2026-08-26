@@ -32,6 +32,16 @@ export const getCategoryList = async ():Promise<Category[]> => {
   }
 };
 
+export const getOnsaleList = async () => {
+  try {
+    const response = await API.get("/products/list?onsale=true");
+    return response.data?.data;
+  } catch (error) {
+    console.error("Failed to fetch Hero Sliders info", error);
+    return [] ;
+  }
+};
+
 export const getProductList = async ():Promise<ProductCardType[]> => {
   try {
     const response = await API.get("/products/list?limit=12&page=1");

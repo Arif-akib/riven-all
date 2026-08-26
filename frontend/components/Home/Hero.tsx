@@ -13,47 +13,61 @@ type HeroProps = {
 
 export default function HeroKeen({data}:HeroProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const autoplay = (slider: any) => {
+  let timeout: ReturnType<typeof setTimeout>;
+  let mouseOver = false;
 
-  const [sliderRef, slider] = useKeenSlider<HTMLDivElement>({
-    loop: true,
-    mode: "snap",
-    slides: { perView: 1 },
+  const clearNextTimeout = () => {
+    clearTimeout(timeout);
+  };
 
-    slideChanged(s) {
-      setCurrentSlide(s.track.details.rel);
-    },
+  const nextTimeout = () => {
+    clearTimeout(timeout);
 
-    created(slider) {
-      let timeout: any;
-      let mouseOver = false;
+    if (mouseOver) return;
 
-      const clearNextTimeout = () => clearTimeout(timeout);
-      const nextTimeout = () => {
-        clearTimeout(timeout);
-        if (mouseOver) return;
-        timeout = setTimeout(() => {
-          slider.next();
-        }, 4000);
-      };
+    timeout = setTimeout(() => {
+      slider.next();
+    }, 4000);
+  };
 
-      slider.on("created", () => {
-        slider.container.addEventListener("mouseover", () => {
-          mouseOver = true;
-          clearNextTimeout();
-        });
-        slider.container.addEventListener("mouseout", () => {
-          mouseOver = false;
-          nextTimeout();
-        });
-        nextTimeout();
-      });
+  slider.on("created", () => {
+    slider.container.addEventListener("mouseenter", () => {
+      mouseOver = true;
+      clearNextTimeout();
+    });
 
-      slider.on("dragStarted", clearNextTimeout);
-      slider.on("animationEnded", nextTimeout);
-      slider.on("updated", nextTimeout);
-    },
+    slider.container.addEventListener("mouseleave", () => {
+      mouseOver = false;
+      nextTimeout();
+    });
+
+    nextTimeout();
   });
 
+  slider.on("dragStarted", clearNextTimeout);
+
+  slider.on("animationEnded", nextTimeout);
+
+  slider.on("updated", nextTimeout);
+};
+
+  const [sliderRef, slider] = useKeenSlider<HTMLDivElement>(
+  {
+    loop: true,
+    mode: "snap",
+    slides: {
+      perView: 1,
+    },
+
+    slideChanged(slider) {
+      setCurrentSlide(slider.track.details.rel);
+    },
+  },
+  [autoplay],
+);
+
+  
   return (
     <section className="pt-5">
       <WebWrapper>

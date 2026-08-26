@@ -10,6 +10,7 @@ import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 
 import type { Review } from "@/types/home.type";
+import HomeButton from "./HomeButton";
 
 type ReviewProps = {
   data: Review[];
@@ -21,91 +22,87 @@ type ReviewCardProps = {
 
 export default function Review({ data }: ReviewProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const autoplay = (slider: any) => {
+    let timeout: ReturnType<typeof setTimeout>;
+    let mouseOver = false;
 
-  const [sliderRef, slider] = useKeenSlider<HTMLDivElement>({
-    loop: true,
-    mode: "snap",
-    slides: {
-      perView: 1,
-      spacing: 10,
-    },
+    const clearNextTimeout = () => {
+      clearTimeout(timeout);
+    };
 
-    breakpoints: {
-      // "(min-width: 640px)": {
-      //   slides: {
-      //     perView: 2,
-      //     spacing: 12,
-      //   },
-      // },
-      "(min-width: 768px)": {
-        slides: {
-          perView: 2,
-          spacing: 15,
-        },
-      },
-      // "(min-width: 1024px)": {
-      //   slides: {
-      //     perView: 4,
-      //     spacing: 20,
-      //   },
-      // },
-      "(min-width: 1280px)": {
-        slides: {
-          perView: 3,
-          spacing: 20,
-        },
-      },
-    },
+    const nextTimeout = () => {
+      clearTimeout(timeout);
 
-    slideChanged(s) {
-      setCurrentSlide(s.track.details.rel);
-    },
+      if (mouseOver) return;
 
-    created(slider) {
-      let timeout: any;
-      let mouseOver = false;
+      timeout = setTimeout(() => {
+        slider.next();
+      }, 4000);
+    };
 
-      const clearNextTimeout = () => clearTimeout(timeout);
-      const nextTimeout = () => {
-        clearTimeout(timeout);
-        if (mouseOver) return;
-        timeout = setTimeout(() => {
-          slider.next();
-        }, 4000);
-      };
+    slider.on("created", () => {
+      slider.container.addEventListener("mouseenter", () => {
+        mouseOver = true;
+        clearNextTimeout();
+      });
 
-      slider.on("created", () => {
-        slider.container.addEventListener("mouseover", () => {
-          mouseOver = true;
-          clearNextTimeout();
-        });
-        slider.container.addEventListener("mouseout", () => {
-          mouseOver = false;
-          nextTimeout();
-        });
+      slider.container.addEventListener("mouseleave", () => {
+        mouseOver = false;
         nextTimeout();
       });
 
-      slider.on("dragStarted", clearNextTimeout);
-      slider.on("animationEnded", nextTimeout);
-      slider.on("updated", nextTimeout);
-    },
-  });
+      nextTimeout();
+    });
 
-  const reviews = [
+    slider.on("dragStarted", clearNextTimeout);
+
+    slider.on("animationEnded", nextTimeout);
+
+    slider.on("updated", nextTimeout);
+  };
+
+  const [sliderRef, slider] = useKeenSlider<HTMLDivElement>(
     {
-      name: "Sarah Khan",
-      text: "Great quality products and very fast delivery. Highly recommended!",
+      loop: true,
+      mode: "snap",
+      slides: {
+        perView: 1,
+        spacing: 10,
+      },
+      breakpoints: {
+        // "(min-width: 640px)": {
+        //   slides: {
+        //     perView: 2,
+        //     spacing: 12,
+        //   },
+        // },
+        "(min-width: 768px)": {
+          slides: {
+            perView: 2,
+            spacing: 15,
+          },
+        },
+        // "(min-width: 1024px)": {
+        //   slides: {
+        //     perView: 4,
+        //     spacing: 20,
+        //   },
+        // },
+        "(min-width: 1280px)": {
+          slides: {
+            perView: 3,
+            spacing: 20,
+          },
+        },
+      },
+
+      slideChanged(slider) {
+        setCurrentSlide(slider.track.details.rel);
+      },
     },
-    {
-      name: "David Miller",
-      text: "Customer service was amazing and the product exceeded expectations.",
-    },
-    {
-      name: "Ayesha Rahman",
-      text: "One of the best online shopping experiences I've had.",
-    },
-  ];
+    [autoplay],
+  );
+
   return (
     <>
       <div className="text-center pt-20">
@@ -120,7 +117,7 @@ export default function Review({ data }: ReviewProps) {
                 </div>
               ))}
             </div>
-            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-2">
               {data.map((_: any, idx: any) => (
                 <button
                   key={idx}
@@ -133,6 +130,8 @@ export default function Review({ data }: ReviewProps) {
                 />
               ))}
             </div>
+
+             {/* <HomeButton text="See All" link="/offer?offer=true"/> */}
           </div>
         </WebWrapper>
       </div>

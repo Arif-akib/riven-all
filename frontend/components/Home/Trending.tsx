@@ -10,6 +10,7 @@ import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 
 import { ProductCardType } from "@/types/product.type";
+import HomeButton from "./HomeButton";
 
 type ProductProps = {
   data:ProductCardType[]
@@ -98,10 +99,10 @@ export default function Trending({data}:ProductProps) {
     <>
       <div className="text-center pt-10">
         <WebWrapper>
-          <HeadlineBadge text="Shop by trends" />
+          <HeadlineBadge text="Trending COLLECTION" />
           <Headline
-            mainText="Best Selling Watches"
-            subText="Top picks our customers can't get enough of"
+            mainText="Discover What’s Trending"
+            subText="Explore whats trending in our collection, curated with style and quality in mind"
           />
           <div className="relative my-10">
             <div ref={sliderRef} className="keen-slider">
@@ -126,9 +127,7 @@ export default function Trending({data}:ProductProps) {
               ))}
             </div>
           </div>
-          <button className="bg-linear-to-r from-[#800000] via-[#6b0000] to-[#4a0000] px-6 py-1.5 rounded-md text-white font-semibold flex items-center justify-center gap-2 hover:-translate-y-2 transition-transform duration-300 cursor-pointer mx-auto">
-            See All
-          </button>
+           <HomeButton text="See All" link="/new_arrival?new=true"/>
         </WebWrapper>
       </div>
     </>

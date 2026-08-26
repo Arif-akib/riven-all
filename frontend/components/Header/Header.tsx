@@ -32,7 +32,7 @@ export default function Header() {
 
   return (
     <>
-      <SubHeader />
+      {/* <SubHeader /> */}
       <div className="bg-white sticky top-0 z-40 shadow-sm shadow-amber-900/10">
         <WebWrapper>
           <div className="grid grid-cols-3 items-center h-20">

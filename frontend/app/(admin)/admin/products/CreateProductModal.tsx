@@ -598,12 +598,12 @@ export default function CreateProductModal({
 
         {/* RIGHT COLUMN - ACTIONS & TOGGLES */}
         <div className="bg-[#800000] text-white p-6 sm:p-8 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-amber-900/30">
-          <div className="space-y-6">
-            <h3 className="text-lg font-bold border-b border-white/20 pb-2">
+          <div className="space-y-2">
+            <h3 className="lg:text-lg font-bold border-b border-white/20 pb-2">
               Product Settings
             </h3>
             
-            <div className="space-y-4">
+            <div className="space-y-2 lg:space-y-4">
               <label className="flex items-center gap-3 cursor-pointer select-none">
                 <input
                   type="checkbox"
@@ -654,11 +654,11 @@ export default function CreateProductModal({
             </div>
           </div>
 
-          <div className="space-y-3 mt-8">
+          <div className="space-y-3 mt-3 lg:mt-8">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-white text-[#800000] hover:bg-gray-100 w-full py-3 rounded-xl font-bold transition flex justify-center items-center gap-2 cursor-pointer shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-white text-[#800000] hover:bg-gray-100 w-full py-3 rounded-xl font-bold transition flex justify-center items-center gap-2 cursor-pointer shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
               {isSubmitting ? (
                 <>
@@ -677,7 +677,7 @@ export default function CreateProductModal({
               type="button"
               disabled={isSubmitting}
               onClick={() => setShowModal(false)}
-              className="border border-white/40 hover:bg-white/10 text-white w-full py-2.5 rounded-xl font-medium transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="border border-white/40 hover:bg-white/10 text-white w-full py-2.5 rounded-xl font-medium transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
               Cancel
             </button>
