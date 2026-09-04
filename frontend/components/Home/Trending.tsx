@@ -13,10 +13,10 @@ import { ProductCardType } from "@/types/product.type";
 import HomeButton from "./HomeButton";
 
 type ProductProps = {
-  data:ProductCardType[]
-}
+  data: ProductCardType[];
+};
 
-export default function Trending({data}:ProductProps) {
+export default function Trending({ data }: ProductProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const [sliderRef, slider] = useKeenSlider<HTMLDivElement>({
@@ -52,7 +52,7 @@ export default function Trending({data}:ProductProps) {
           spacing: 20,
         },
       },
-       "(min-width: 1400px)": {
+      "(min-width: 1400px)": {
         slides: {
           perView: 6,
           spacing: 20,
@@ -104,30 +104,14 @@ export default function Trending({data}:ProductProps) {
             mainText="Discover What’s Trending"
             subText="Explore whats trending in our collection, curated with style and quality in mind"
           />
-          <div className="relative my-10">
-            <div ref={sliderRef} className="keen-slider">
-              {data.map((item:ProductCardType , index:number) => (
-                <div key={index} className="keen-slider__slide">
-                  <ProductCard item={item} />
-                </div>
-              ))}
-            </div>
-
-            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
-              {data.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => slider.current?.moveToIdx(idx)}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    currentSlide === idx
-                      ? "w-6 bg-amber-700"
-                      : "w-2 bg-amber-900 hover:bg-amber-700"
-                  }`}
-                />
-              ))}
-            </div>
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 my-10">
+            {data?.map((item: ProductCardType, index: number) => (
+              <div key={index}>
+                <ProductCard item={item} />
+              </div>
+            ))}
           </div>
-           <HomeButton text="See All" link="/new_arrival?new=true"/>
+          <HomeButton text="See All" link="/new_arrival?new=true" />
         </WebWrapper>
       </div>
     </>

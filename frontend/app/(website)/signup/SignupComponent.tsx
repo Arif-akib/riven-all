@@ -1,207 +1,190 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Lock, User, Eye, EyeOff, PhoneCall } from "lucide-react";
-import API from "@/lib/axios";
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { User, Mail, PhoneCall, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 
-export default function SignupComponent() {
+export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [registerLoader, setRegisterLoader] = useState(false);
-
+  
   const [form, setForm] = useState({
     name: "",
     email: "",
-    password: "",
-    confirmPassowrd: "",
     phone: "",
+    password: "",
+    confirmPassword: "",
+    agreeToTerms: false,
   });
 
-  const router = useRouter();
-
-  const handleChange = (e: any) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
-  const handleRegister = async (e: any) => {
+  const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
-    setRegisterLoader(true);
-    try {
-      if (form.password != form.confirmPassowrd) {
-        toast.error("Password and Confirm Password didnot match");
-        return;
-      }
-      const res = await API.post("/user/register", form);
-      router.push("/signin");
-      toast.success("Registration complete");
-    } catch (err) {
-      toast.error("Can not Register");
-    } finally {
-      setRegisterLoader(false);
-    }
+    // Handle registration logic here
   };
+
   return (
-    <div className="p-10 bg-white">
-      <h1 className="text-3xl font-bold text-gray-800 mb-2">Create Account</h1>
+    <div className="bg-white p-6 sm:p-8">
+      {/* Header */}
+      <div className="mb-6 text-center sm:text-left">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          Create Account
+        </h1>
+        <p className="text-xs text-slate-500 mt-1">
+          Join us today to manage orders and fast checkout.
+        </p>
+      </div>
 
-      <p className="text-gray-500 mb-5">Sign up to start shopping</p>
-
-      <form onSubmit={handleRegister} className="space-y-3">
-        {/* Name */}
+      <form onSubmit={handleRegister} className="space-y-3.5">
+        {/* Full Name */}
         <div>
-          <label className="text-sm text-gray-600">Full Name</label>
-
-          <div className="flex items-center mt-1 border border-amber-800 rounded-lg px-3 py-2 focus-within:border-[#800020]">
-            <User size={18} className="text-amber-800 mr-2" />
-
+          <label className="block text-xs font-semibold text-slate-700 mb-1">
+            Full Name
+          </label>
+          <div className="relative flex items-center">
+            <User size={16} className="absolute left-3.5 text-slate-400 pointer-events-none" />
             <input
               onChange={handleChange}
               value={form.name}
               name="name"
               type="text"
               placeholder="John Doe"
-              className="w-full outline-none"
+              required
+              className="w-full pl-10 pr-3 py-2 text-xs bg-slate-50/70 rounded-xl border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-900/10 focus:border-rose-900 transition-all"
             />
           </div>
         </div>
 
-        {/* Email */}
-        <div>
-          <label className="text-sm text-gray-600">Email Address</label>
-
-          <div className="flex items-center mt-1 border border-amber-800 rounded-lg px-3 py-2 focus-within:border-[#800020]">
-            <Mail size={18} className="text-amber-800 mr-2" />
-
-            <input
-              onChange={handleChange}
-              value={form.email}
-              name="email"
-              type="email"
-              placeholder="you@email.com"
-              className="w-full outline-none"
-            />
+        {/* Email & Phone Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Email
+            </label>
+            <div className="relative flex items-center">
+              <Mail size={16} className="absolute left-3.5 text-slate-400 pointer-events-none" />
+              <input
+                onChange={handleChange}
+                value={form.email}
+                name="email"
+                type="email"
+                placeholder="you@email.com"
+                required
+                className="w-full pl-10 pr-3 py-2 text-xs bg-slate-50/70 rounded-xl border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-900/10 focus:border-rose-900 transition-all"
+              />
+            </div>
           </div>
-        </div>
-        {/* phone  */}
-        <div>
-          <label className="text-sm text-gray-600">Phone Number</label>
 
-          <div className="flex items-center mt-1 border border-amber-800 rounded-lg px-3 py-2 focus-within:border-[#800020]">
-            <PhoneCall size={18} className="text-amber-800 mr-2" />
-
-            <input
-              onChange={handleChange}
-              value={form.phone}
-              name="phone"
-              min={11}
-              max={11}
-              type="number"
-              placeholder="01xxxxxxxxx"
-              className="w-full outline-none"
-            />
-          </div>
-        </div>
-
-        {/* Password */}
-        <div>
-          <label className="text-sm text-gray-600">Password</label>
-
-          <div className="flex items-center mt-1 border border-amber-800 rounded-lg px-3 py-2 focus-within:border-[#800020]">
-            <Lock size={18} className="text-amber-800 mr-2" />
-
-            <input
-              onChange={handleChange}
-              value={form.password}
-              name="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="••••••••"
-              className="w-full outline-none"
-            />
-
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? (
-                <EyeOff size={18} className="text-amber-800" />
-              ) : (
-                <Eye size={18} className="text-amber-800" />
-              )}
-            </button>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Phone
+            </label>
+            <div className="relative flex items-center">
+              <PhoneCall size={16} className="absolute left-3.5 text-slate-400 pointer-events-none" />
+              <input
+                onChange={handleChange}
+                value={form.phone}
+                name="phone"
+                type="tel"
+                placeholder="01XXXXXXXXX"
+                required
+                className="w-full pl-10 pr-3 py-2 text-xs bg-slate-50/70 rounded-xl border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-900/10 focus:border-rose-900 transition-all"
+              />
+            </div>
           </div>
         </div>
 
-        {/* Confirm Password */}
-        <div>
-          <label className="text-sm text-gray-600">Confirm Password</label>
+        {/* Password & Confirm Password Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Password
+            </label>
+            <div className="relative flex items-center">
+              <Lock size={16} className="absolute left-3.5 text-slate-400 pointer-events-none" />
+              <input
+                onChange={handleChange}
+                value={form.password}
+                name="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                required
+                className="w-full pl-10 pr-9 py-2 text-xs bg-slate-50/70 rounded-xl border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-900/10 focus:border-rose-900 transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 text-slate-400 hover:text-slate-600 transition-colors"
+                aria-label="Toggle password visibility"
+              >
+                {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+              </button>
+            </div>
+          </div>
 
-          <div className="flex items-center mt-1 border border-amber-800 rounded-lg px-3 py-2 focus-within:border-[#800020]">
-            <Lock size={18} className="text-amber-800 mr-2" />
-
-            <input
-              onChange={handleChange}
-              value={form.confirmPassowrd}
-              name="confirmPassowrd"
-              type={showConfirm ? "text" : "password"}
-              placeholder="••••••••"
-              className="w-full outline-none"
-            />
-
-            <button type="button" onClick={() => setShowConfirm(!showConfirm)}>
-              {showConfirm ? (
-                <EyeOff size={18} className="text-amber-800" />
-              ) : (
-                <Eye size={18} className="text-amber-800" />
-              )}
-            </button>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Confirm Password
+            </label>
+            <div className="relative flex items-center">
+              <Lock size={16} className="absolute left-3.5 text-slate-400 pointer-events-none" />
+              <input
+                onChange={handleChange}
+                value={form.confirmPassword}
+                name="confirmPassword"
+                type={showConfirm ? "text" : "password"}
+                placeholder="••••••••"
+                required
+                className="w-full pl-10 pr-9 py-2 text-xs bg-slate-50/70 rounded-xl border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-900/10 focus:border-rose-900 transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirm(!showConfirm)}
+                className="absolute right-3 text-slate-400 hover:text-slate-600 transition-colors"
+                aria-label="Toggle confirm password visibility"
+              >
+                {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Terms */}
-        <label className="flex items-center gap-2 text-sm text-gray-600">
-          <input type="checkbox" />I agree to the Terms & Conditions
-        </label>
+        <div className="pt-1">
+          <label className="flex items-center gap-2 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              name="agreeToTerms"
+              checked={form.agreeToTerms}
+              onChange={handleChange}
+              required
+              className="h-4 w-4 rounded border-slate-300 text-rose-900 focus:ring-rose-900/20 transition"
+            />
+            <span className="text-xs text-slate-600">
+              I agree to the{" "}
+              <Link href="/terms" className="text-rose-900 font-medium underline-offset-2 hover:underline">
+                Terms & Conditions
+              </Link>
+            </span>
+          </label>
+        </div>
 
-        {/* Button */}
+        {/* Submit Button */}
         <button
           type="submit"
-          className="w-full py-3 rounded-lg bg-[#800020] text-white font-semibold hover:bg-[#650018] transition"
+          className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-rose-950 via-rose-900 to-rose-800 text-white font-medium text-xs sm:text-sm shadow-md shadow-rose-950/10 hover:shadow-lg hover:shadow-rose-950/20 transition-all flex items-center justify-center gap-2 group mt-2"
         >
-          Create Account
+          <span>Create Account</span>
+          <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
         </button>
-
-        {/* Divider */}
-        {/* <div className="flex items-center gap-3">
-              <div className="flex-1 h-px bg-gray-200"></div>
-              <span className="text-sm text-gray-400">OR</span>
-              <div className="flex-1 h-px bg-gray-200"></div>
-            </div> */}
-
-        {/* Google Login */}
-        {/* <div className="flex items-center justify-center gap-3 w-full py-2.5 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition font-medium text-gray-700">
-              <Image
-                src="https://www.svgrepo.com/show/475656/google-color.svg"
-                alt="Google"
-                width={20}
-                height={20}
-              />
-              Continue with Google
-            </div> */}
-
-        {/* <p className="text-center text-sm text-gray-500">
-              Already have an account?{" "}
-              <Link
-                href="/signin"
-                className="text-[#800020] font-semibold hover:underline"
-              >
-                Sign in
-              </Link>
-            </p> */}
       </form>
     </div>
   );

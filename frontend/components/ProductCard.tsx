@@ -8,12 +8,15 @@ import { Eye, Heart, ShoppingCart } from "lucide-react";
 
 import { ProductCardType } from "@/types/product.type";
 import AddToCartModal from "./AddToCartModal";
+import { useWishlistStore } from "@/store/wishlist.store";
 
 type ProductCardProps = {
   item: ProductCardType;
 };
 
 export default function ProductCard({ item }: ProductCardProps) {
+  const { toggleWishlist, isInWishlist } = useWishlistStore();
+  const isWishlisted = isInWishlist(item._id,);
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -102,7 +105,9 @@ export default function ProductCard({ item }: ProductCardProps) {
             </button>
 
             {/* Wishlist Button */}
-            <button className="p-2 rounded-full bg-white/70 backdrop-blur-md border border-gray-200 shadow-sm hover:shadow-md hover:bg-amber-700 hover:text-white hover:scale-110 active:scale-95 transition-all duration-300">
+            <button onClick={()=>toggleWishlist(item)} className={`p-2 rounded-full backdrop-blur-md border shadow-sm hover:shadow-md hover:bg-amber-700 hover:text-white hover:scale-110 active:scale-95 transition-all duration-300 ${isWishlisted
+        ? "bg-amber-700 text-white border-amber-700"
+        : "bg-white/70 border-gray-200"}`}>
               <Heart className="size-4" />
             </button>
           </div>

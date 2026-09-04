@@ -10,7 +10,7 @@ export default function WebLayout({
   return (
     <>
       <Header />
-      <div className="w-full min-h-[70vh] bg-white pb-10">
+      <div className="w-full min-h-[70vh] bg-white capitalize">
         {children}
       </div>
       <ScrollToTop />

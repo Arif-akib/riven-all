@@ -78,44 +78,13 @@ const orderItemSchema = new mongoose.Schema(
 
 const customerInfoSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-
-    phone: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-
-    email: {
-      type: String,
-      trim: true,
-      lowercase: true,
-    },
-
-    address: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-
-    city: {
-      type: String,
-      trim: true,
-    },
-
-    area: {
-      type: String,
-      trim: true,
-    },
-
-    postalCode: {
-      type: String,
-      trim: true,
-    },
+    name: { type: String, required: true, trim: true },
+    phone: { type: String, required: true, trim: true },
+    email: { type: String, trim: true, lowercase: true },
+    street: { type: String, required: true },
+    city: { type: String, required: true },
+    zip: { type: String, requried:true},
+    country: { type: String, required: true },
   },
   {
     _id: false,
@@ -229,12 +198,7 @@ const orderSchema = new mongoose.Schema(
 
     paymentStatus: {
       type: String,
-      enum: [
-        "pending",
-        "paid",
-        "failed",
-        "refunded",
-      ],
+      enum: ["pending", "paid", "failed", "refunded"],
       default: "pending",
     },
 
@@ -296,11 +260,7 @@ const orderSchema = new mongoose.Schema(
 
 orderSchema.pre("save", function (next) {
   if (!this.orderId) {
-    const random =
-      Math.random()
-        .toString(36)
-        .substring(2, 6)
-        .toUpperCase();
+    const random = Math.random().toString(36).substring(2, 6).toUpperCase();
 
     const date = new Date();
 
@@ -312,7 +272,7 @@ orderSchema.pre("save", function (next) {
     this.orderId = `ORD-${formattedDate}-${random}`;
   }
 
-  next();
+  // next();
 });
 
 /**
@@ -327,7 +287,4 @@ orderSchema.index({ orderStatus: 1 });
 
 orderSchema.index({ paymentStatus: 1 });
 
-module.exports = mongoose.model(
-  "Order",
-  orderSchema,
-);
+module.exports = mongoose.model("Order", orderSchema);

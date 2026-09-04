@@ -6,20 +6,12 @@ import { persist } from "zustand/middleware";
  */
 export type CartItem = {
   productId: string;
-
-  // fallback identifier (since you don't have variantId)
   variantKey: string;
-
   quantity: number;
-
   productName: string;
-
   productImage: string;
-
   variantLabel: string;
-
   price: number;
-  
 };
 
 type CartStore = {
@@ -27,26 +19,21 @@ type CartStore = {
 
   addToCart: (item: CartItem) => void;
 
-  removeFromCart: (
-    productId: string,
-    variantKey: string
-  ) => void;
+  removeFromCart: (productId: string, variantKey: string) => void;
 
-  increaseQuantity: (
-    productId: string,
-    variantKey: string
-  ) => void;
+  increaseQuantity: (productId: string, variantKey: string) => void;
 
-  decreaseQuantity: (
-    productId: string,
-    variantKey: string
-  ) => void;
+  decreaseQuantity: (productId: string, variantKey: string) => void;
 
   clearCart: () => void;
 
   getTotalItems: () => number;
 
   getTotalPrice: () => number;
+
+  clearSelectedItems: (
+    itemsToClear: { productId: string; variantKey: string }[],
+  ) => void;
 };
 
 export const useCartStore = create<CartStore>()(
@@ -64,7 +51,7 @@ export const useCartStore = create<CartStore>()(
           const existing = state.cart.find(
             (c) =>
               c.productId === item.productId &&
-              c.variantKey === item.variantKey
+              c.variantKey === item.variantKey,
           );
 
           if (existing) {
@@ -74,13 +61,11 @@ export const useCartStore = create<CartStore>()(
                   c.productId === item.productId &&
                   c.variantKey === item.variantKey
                 ) {
-                  const updatedQty =
-                    c.quantity + item.quantity;
+                  const updatedQty = c.quantity + item.quantity;
 
                   return {
                     ...c,
-                    quantity:
-                      updatedQty
+                    quantity: updatedQty,
                   };
                 }
 
@@ -94,8 +79,7 @@ export const useCartStore = create<CartStore>()(
               ...state.cart,
               {
                 ...item,
-                quantity:
-                  item.quantity
+                quantity: item.quantity,
               },
             ],
           };
@@ -108,10 +92,7 @@ export const useCartStore = create<CartStore>()(
         set((state) => ({
           cart: state.cart.filter(
             (item) =>
-              !(
-                item.productId === productId &&
-                item.variantKey === variantKey
-              )
+              !(item.productId === productId && item.variantKey === variantKey),
           ),
         })),
 
@@ -125,7 +106,6 @@ export const useCartStore = create<CartStore>()(
               item.productId === productId &&
               item.variantKey === variantKey
             ) {
-
               return {
                 ...item,
                 quantity: item.quantity + 1,
@@ -163,14 +143,23 @@ export const useCartStore = create<CartStore>()(
        */
       clearCart: () => set({ cart: [] }),
 
+      clearSelectedItems: (itemsToClear) =>
+        set((state) => ({
+          cart: state.cart.filter(
+            (cartItem) =>
+              !itemsToClear.some(
+                (target) =>
+                  target.productId === cartItem.productId &&
+                  target.variantKey === cartItem.variantKey,
+              ),
+          ),
+        })),
+
       /**
        * TOTAL ITEMS
        */
       getTotalItems: () => {
-        return get().cart.reduce(
-          (sum, item) => sum + item.quantity,
-          0
-        );
+        return get().cart.reduce((sum, item) => sum + item.quantity, 0);
       },
 
       /**
@@ -179,15 +168,14 @@ export const useCartStore = create<CartStore>()(
        */
       getTotalPrice: () => {
         return get().cart.reduce(
-          (sum, item) =>
-            sum + item.price * item.quantity,
-          0
+          (sum, item) => sum + item.price * item.quantity,
+          0,
         );
       },
     }),
 
     {
       name: "cart-storage",
-    }
-  )
+    },
+  ),
 );

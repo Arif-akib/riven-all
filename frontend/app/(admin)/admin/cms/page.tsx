@@ -14,7 +14,7 @@ export default function CMSPage() {
     <div className="">
       {/* Tabs */}
       <div className="flex gap-3 mb-6 flex-wrap">
-        {["hero", "offer", "review", "popup", "promotion"].map((t) => (
+        {["hero", "offer", "review", "popup"].map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}

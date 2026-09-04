@@ -4,7 +4,7 @@ import ShopPageComponent from "@/components/ShopPageComponent";
 export default function ShopPage() {
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-[70vh]">
       <WebWrapper>
         <ShopPageComponent/>
       </WebWrapper>

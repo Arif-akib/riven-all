@@ -51,9 +51,9 @@ export default async function HomePage() {
 
       {/* <HomeBrand data={brandList} /> */}
 
-      <Trending data={trendingList} />
-
       <PromoSection data={offerList} />
+
+      <Trending data={trendingList} />
 
       <Review data={reviewList} />
     </>

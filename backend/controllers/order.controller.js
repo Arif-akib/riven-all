@@ -3,10 +3,12 @@
 const mongoose = require("mongoose");
 const Product = require("../models/product.model");
 const Order = require("../models/order.model");
+const User = require("../models/user.model");
 
 const ShippingSettings = require("../models/shippingSettings.model");
 const DiscountSettings = require("../models/discountSettings.model");
 
+const { getShippingFee } = require("../utils/getShippingPrice");
 
 exports.validateCart = async (req, res) => {
   try {
@@ -24,6 +26,7 @@ exports.validateCart = async (req, res) => {
 
     const products = await Product.find({
       _id: { $in: productIds },
+      isActive: true,
     });
 
     const productMap = new Map();
@@ -31,7 +34,7 @@ exports.validateCart = async (req, res) => {
 
     let subtotal = 0;
     let discount = 0;
-    let shipping = 80;
+    let shipping = 0;
 
     const validatedItems = [];
 
@@ -143,28 +146,32 @@ exports.validateCart = async (req, res) => {
 };
 
 // PLACE ORDER user
-exports.placeOrder = async (req, res) => {
+exports.placeOrder = async (req, res, next) => {
   const session = await mongoose.startSession();
 
   try {
     session.startTransaction();
 
-    const { items, customerInfo, paymentMethod, note } =
-      req.body;
+    // 1. Move DB operations inside try block
+    const user = await User.findById(req.user.id).session(session);
+
+    if (!user?.name || !user?.phone || !user?.email) {
+      throw new Error("Missing customer info");
+    }
+
+    const { items, paymentMethod, address, note } = req.body;
 
     if (!Array.isArray(items) || items.length === 0) {
       throw new Error("Cart is empty");
     }
 
-    if (!customerInfo?.name || !customerInfo?.phone || !customerInfo?.address) {
-      throw new Error("Missing customer info");
+    if (!address || !address.city || !address.zip || !address.country) {
+      throw new Error("Missing or incomplete delivery address");
     }
 
-    /**
-     * SETTINGS
-     */
-    // const shippingSettings = await ShippingSettings.findOne();
-    // const discountSettings = await DiscountSettings.findOne();
+    if (!paymentMethod) {
+      throw new Error("Select any payment method");
+    }
 
     /**
      * BULK PRODUCT FETCH
@@ -176,29 +183,23 @@ exports.placeOrder = async (req, res) => {
     }).session(session);
 
     const productMap = new Map();
-    products.forEach((p) =>
-      productMap.set(p._id.toString(), p),
-    );
+    products.forEach((p) => productMap.set(p._id.toString(), p));
 
     let subtotal = 0;
     let discount = 0;
-    let shipping = 0;
+    let shipping = getShippingFee(address);
 
     const orderItems = [];
 
     /**
-     * VALIDATION LOOP
+     * VALIDATION & STOCK LOOP
      */
     for (const item of items) {
-      const product = productMap.get(
-        item.productId.toString(),
-      );
+      const product = productMap.get(item.productId.toString());
 
       if (!product) throw new Error("Product not found");
 
-      const variant = product.variants.find(
-        (v) => v.sku === item.variantKey,
-      );
+      const variant = product.variants.find((v) => v.sku === item.variantKey);
 
       if (!variant) throw new Error("Variant not found");
 
@@ -208,17 +209,12 @@ exports.placeOrder = async (req, res) => {
         throw new Error("Invalid quantity");
       }
 
-    //   if (variant.countInStock < quantity) {
-    //     throw new Error(
-    //       `Only ${variant.countInStock} stock available for ${product.name}`,
-    //     );
-    //   }
+      // Prevent negative stock
+      if (variant.countInStock < quantity) {
+        throw new Error(`Only ${variant.countInStock} stock available for ${product.name}`);
+      }
 
-      const finalPrice =
-        variant.discountPrice > 0
-          ? variant.discountPrice
-          : variant.price;
-
+      const finalPrice = variant.discountPrice > 0 ? variant.discountPrice : variant.price;
       const itemSubtotal = finalPrice * quantity;
 
       subtotal += itemSubtotal;
@@ -238,53 +234,28 @@ exports.placeOrder = async (req, res) => {
         subtotal: itemSubtotal,
       });
 
-      /**
-       * STOCK UPDATE
-       */
-      variant.countInStock -= quantity;
+      // Deduct stock
+      // variant.countInStock -= quantity;
     }
-
-    /**
-     * DISCOUNT
-     */
-    // if (
-    //   discountSettings?.isActive &&
-    //   subtotal >= discountSettings.minimumAmount
-    // ) {
-    //   if (discountSettings.discountType === "flat") {
-    //     discount = discountSettings.discountValue;
-    //   }
-
-    //   if (discountSettings.discountType === "percentage") {
-    //     discount =
-    //       (subtotal * discountSettings.discountValue) / 100;
-
-    //     if (discount > discountSettings.maximumDiscountAmount) {
-    //       discount = discountSettings.maximumDiscountAmount;
-    //     }
-    //   }
-    // }
-
-    /**
-     * SHIPPING
-     */
-    // shipping = shippingSettings?.standardShippingFee || 80;
-
-    // if (
-    //   shippingSettings?.freeShippingEnabled &&
-    //   subtotal >= shippingSettings.freeShippingMinimumAmount
-    // ) {
-    //   shipping = 0;
-    // }
 
     /**
      * CREATE ORDER
      */
+    const total = subtotal + shipping - discount;
+
     const order = await Order.create(
       [
         {
-          userId: req.user.id,
-          customerInfo,
+          user: user.id,
+          customerInfo: {
+            name: user.name,
+            phone: user.phone,
+            email: user.email,
+            street: address.street,
+            city: address.city,
+            zip: address.zip,
+            country: address.country,
+          },
           items: orderItems,
           paymentMethod,
           note,
@@ -298,11 +269,11 @@ exports.placeOrder = async (req, res) => {
           orderStatus: "pending",
         },
       ],
-      { session },
+      { session }
     );
 
     /**
-     * SAVE STOCK
+     * SAVE UPDATED PRODUCTS
      */
     for (const product of products) {
       await product.save({ session });
@@ -316,11 +287,13 @@ exports.placeOrder = async (req, res) => {
       order: order[0],
     });
   } catch (error) {
-    await session.abortTransaction();
+    if (session.inTransaction()) {
+      await session.abortTransaction();
+    }
 
-    console.error(error);
+    console.error("Order Creation Error:", error);
 
-    return res.status(500).json({
+    return res.status(400).json({
       success: false,
       message: error.message || "Order failed",
     });
@@ -345,7 +318,7 @@ exports.getMyOrders = async (req, res, next) => {
   }
 };
 
-// use both for user and admin 
+// use both for user and admin
 exports.getOrder = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -368,12 +341,10 @@ exports.getOrder = async (req, res, next) => {
   }
 };
 
-
-// admin 
+// admin
 exports.getOrders = async (req, res, next) => {
   try {
-    const orders = await Order.find()
-      .sort({ createdAt: -1 });
+    const orders = await Order.find().sort({ createdAt: -1 });
 
     return res.status(200).json({
       success: true,
@@ -385,18 +356,11 @@ exports.getOrders = async (req, res, next) => {
   }
 };
 
-
-
 exports.updateOrder = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const {
-      orderStatus,
-      paymentStatus,
-      note,
-      customerInfo,
-    } = req.body;
+    const { orderStatus, paymentStatus, note, customerInfo } = req.body;
 
     const order = await Order.findById(id);
 

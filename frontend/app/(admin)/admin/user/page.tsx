@@ -241,8 +241,8 @@ export default function UserPage() {
           className="border border-gray-200 focus:border-amber-900 rounded-lg px-3 py-2 text-xs outline-none bg-white text-gray-700 font-medium"
         >
           <option value="">All Roles</option>
-          <option value="user font-normal">User</option>
-          <option value="admin font-normal">Admin</option>
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
         </select>
       </div>
 

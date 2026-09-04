@@ -118,20 +118,20 @@ export default function ShopPageComponent() {
   return (
     <>
       {!loading && (
-        <div className="flex flex-col lg:flex-row gap-6 relative">
+        <div className="flex flex-col xl:flex-row gap-6 relative">
           {/* Mobile Overlay */}
           {open && (
             <div
               onClick={() => setOpen(false)}
-              className="fixed inset-0 bg-black/40 z-40 lg:hidden"
+              className="fixed inset-0 bg-black/40 z-50 xl:hidden"
             />
           )}
 
           {/* Sidebar */}
           <aside
-            className={`fixed lg:sticky top-0 lg:top-22 left-0 h-screen overflow-y-auto lg:h-fit w-60 bg-white p-6 shadow-lg lg:shadow-sm z-50 lg:z-0 transform transition-transform duration-300 rounded-none lg:rounded-2xl ${
+            className={`fixed xl:sticky top-0 xl:top-22 left-0 h-screen overflow-y-auto xl:h-[88vh] w-60 bg-white xl:mt-5 z-50 xl:z-0 transform transition-transform p-5 xl:p-0 ${
               open ? "translate-x-0" : "-translate-x-full"
-            } lg:translate-x-0`}
+            } xl:translate-x-0`}
           >
             {/* Sidebar Header */}
             <div className="flex justify-between items-center mb-3 border-b border-amber-900/50 pb-3">
@@ -143,7 +143,7 @@ export default function ShopPageComponent() {
 
               <button
                 onClick={() => setOpen(false)}
-                className="lg:hidden text-amber-800"
+                className="xl:hidden text-amber-800"
               >
                 ✕
               </button>
@@ -235,7 +235,7 @@ export default function ShopPageComponent() {
           {/* Products Section */}
           <div className="flex-1 mt-5">
             {/* Mobile Header */}
-            <div className="flex justify-between items-center mb-4 lg:hidden">
+            <div className="flex justify-between items-center mb-4 xl:hidden">
               <h2 className="text-xl font-bold text-[#800000]">
                 Shop Products
               </h2>
@@ -250,7 +250,7 @@ export default function ShopPageComponent() {
             </div>
 
             {/* Desktop Header */}
-            <div className="hidden lg:flex justify-between items-center mb-6">
+            <div className="hidden xl:flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-[#800000]">
                 Shop Products
               </h2>

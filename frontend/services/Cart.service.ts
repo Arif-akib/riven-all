@@ -1,5 +1,3 @@
-// services/cart.service.ts
-
 import API from "@/lib/axios";
 
 export const validateCart = async (cart: any[]) => {

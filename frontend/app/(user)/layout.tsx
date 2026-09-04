@@ -1,8 +1,15 @@
 "use client";
 
-import { Home, Package, MapPin, Heart, Settings, LogOut } from "lucide-react";
+import {
+  LayoutDashboard,
+  ShoppingBag,
+  MapPin,
+  Heart,
+  Settings,
+  LogOut,
+  ChevronRight,
+} from "lucide-react";
 import ScrollToTop from "@/components/ScrollToTop";
-import WebWrapper from "@/components/Wrapper/webWrapper";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Header from "@/components/Header/Header";
@@ -15,125 +22,172 @@ export default function UserLayout({
 }>) {
   const pathname = usePathname();
 
-  const pageContent = {
+  const pageContent: Record<string, { title: string; subtitle: string }> = {
     "/user/dashboard": {
-      title: "My Account",
-      subtitle: "Welcome back, Arif Akib 👋",
+      title: "Account Overview",
+      subtitle: "Here is what's happening with your account and recent orders",
     },
     "/user/orders": {
       title: "My Orders",
-      subtitle: "Track, manage and review your orders",
+      subtitle: "Track shipments, view invoices, and manage returns",
     },
     "/user/address": {
-      title: "My Addresses",
-      subtitle: "Manage your shipping and billing addresses",
+      title: "Saved Addresses",
+      subtitle: "Update shipping and billing locations for faster checkout",
     },
     "/user/wishlist": {
-      title: "Wishlist",
-      subtitle: "Your saved favorite products",
+      title: "My Wishlist",
+      subtitle: "Items you saved for later purchase",
     },
     "/user/settings": {
       title: "Account Settings",
-      subtitle: "Update your profile and account preferences",
+      subtitle: "Control profile security, password, and notifications",
     },
   };
 
-  const renderContent = () => {
-    const content =
-      pageContent[pathname as keyof typeof pageContent] ??
-      pageContent["/user/dashboard"];
-
-    return (
-      <div className="space-y-2">
-        <h1 className="text-4xl font-bold">{content.title}</h1>
-        <p className="text-rose-100 text-sm md:text-base">{content.subtitle}</p>
-      </div>
-    );
+  const currentContent = pageContent[pathname] ?? {
+    title: "User Account",
+    subtitle: "Manage your account activity and preferences",
   };
 
   const menuItems = [
-    { label: "Overview", icon: <Home size={18} />, href: "/user/dashboard" },
-    {
-      label: "My Orders",
-      icon: <Package size={18} />,
-      href: "/user/orders",
-    },
-    { label: "Wishlist", icon: <Heart size={18} />, href: "/user/wishlist" },
-    {
-      label: "Addresses",
-      icon: <MapPin size={18} />,
-      href: "/user/address",
-    },
-    {
-      label: "Settings",
-      icon: <Settings size={18} />,
-      href: "/user/settings",
-    },
+    { label: "Overview", icon: LayoutDashboard, href: "/user/dashboard" },
+    { label: "My Orders", icon: ShoppingBag, href: "/user/orders" },
+    { label: "Wishlist", icon: Heart, href: "/user/wishlist" },
+    { label: "Addresses", icon: MapPin, href: "/user/address" },
+    { label: "Settings", icon: Settings, href: "/user/settings" },
   ];
 
   return (
-    <>
+    <div className="min-h-[70vh] bg-slate-50/70 selection:bg-rose-200">
       <Header />
-      <div className="w-full min-h-[70vh] bg-gradient-to-br from-rose-50 via-red-50 to-amber-50 pb-12">
-        {/* HEADER */}
-        <div className="bg-gradient-to-r from-[#800000] via-[#6b0000] to-[#4a0000] min-h-44 flex items-center text-white shadow-lg">
-          <WebWrapper>{renderContent()}</WebWrapper>
-        </div>
 
-        <WebWrapper>
-          <div className="flex items-start gap-8 mt-8 relative">
-            {/* SIDEBAR */}
-            <aside className="w-72 bg-white rounded-2xl shadow-xl border border-rose-200 flex flex-col overflow-hidden sticky top-24">
-              {/* User Profile */}
-              <div className="p-6 flex items-center gap-2 bg-rose-100">
-                <p className="size-10 bg-gradient-to-r from-[#800000] via-[#6b0000] to-[#4a0000] text-2xl font-extrabold text-white rounded-full flex justify-center items-center">
-                  A
-                </p>
-
-                <div>
-                  <p className="font-semibold text-gray-800">Arif Akib</p>
-                  <p className="text-sm text-gray-500">a@gmail.com</p>
+      {/* Main Layout Area */}
+      <div className="flex flex-col lg:flex-row">
+        {/* Desktop Sticky Sidebar */}
+        <aside className="hidden lg:block sticky top-20 w-60 h-[calc(100vh-80px)] bg-linear-to-r from-[#800000] via-[#6b0000] to-[#4a0000]">
+          <div className="flex flex-col justify-between border-r border-slate-200/80 overflow-y-auto p-3 space-y-2 h-[calc(100vh-80px)]">
+            <div className="space-y-3">
+              <div className="p-1 bg-linear-to-b from-rose-50/70 to-slate-50/30 rounded-2xl border border-rose-100/60 flex items-center gap-3.5">
+                <div className="relative">
+                  <div className="h-12 w-12 rounded-2xl bg-linear-to-tr from-rose-950 via-rose-900 to-rose-700 text-white font-bold text-lg flex items-center justify-center shadow-md shadow-rose-900/10">
+                    A
+                  </div>
+                  <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-emerald-500 ring-2 ring-white" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h2 className="font-semibold text-rose-950 truncate text-sm">
+                    Arif Akib
+                  </h2>
+                  <p className="text-xs text-rose-950 truncate">a@gmail.com</p>
                 </div>
               </div>
 
-              {/* MENU */}
-              <nav className="flex-1 p-4 space-y-1">
+              {/* Sidebar Navigation */}
+              <nav className="space-y-1">
                 {menuItems.map((item) => {
+                  const Icon = item.icon;
                   const active = pathname === item.href;
 
                   return (
                     <Link
-                      href={item.href}
                       key={item.href}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group font-medium ${active ? "bg-gradient-to-r from-[#800000] via-[#6b0000] to-[#4a0000] text-white" : "text-gray-700 hover:bg-rose-100"}`}
+                      href={item.href}
+                      className={`group flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                        active
+                          ? "bg-linear-to-r from-white to-rose-300 text-red-900 shadow-md shadow-rose-900/10"
+                          : "text-slate-200 hover:bg-slate-100/70 hover:text-slate-900"
+                      }`}
                     >
-                      <span>{item.icon}</span>
-
-                      {item.label}
+                      <div className="flex items-center gap-3">
+                        <Icon
+                          size={18}
+                          className={
+                            active
+                              ? "text-red-900"
+                              : "text-slate-100 group-hover:text-slate-700"
+                          }
+                        />
+                        <span>{item.label}</span>
+                      </div>
+                      <ChevronRight
+                        size={16}
+                        className={`transition-transform duration-200 ${
+                          active
+                            ? "opacity-100 text-red-900 translate-x-0"
+                            : "opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 text-slate-800"
+                        }`}
+                      />
                     </Link>
                   );
                 })}
-                <button
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group font-medium text-rose-800 hover:bg-rose-100 w-full`}
-                >
-                  <span className={`text-rose-700`}>
-                    <LogOut size={18} />
-                  </span>
-                  Logout
-                </button>
               </nav>
-            </aside>
+            </div>
+            {/* User Profile Card */}
 
-            {/* CONTENT AREA */}
-            <main className="flex-1 bg-white rounded-2xl shadow-xl border border-rose-100 p-8 min-h-[440px]">
-              {children}
-            </main>
+            {/* Logout Button */}
+            <div className="pt-2 border-t border-rose-500/30">
+              <button
+                type="button"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-white hover:text-rose-600 hover:bg-rose-50 transition-colors"
+              >
+                <LogOut size={18} />
+                <span>Logout</span>
+              </button>
+            </div>
           </div>
-        </WebWrapper>
+        </aside>
+
+        {/* Main Content Area */}
+        <main className="min-h-[calc(100vh-80px)] w-full max-w-[calc(100%-240px)] bg-slate-50/50 p-4 sm:p-8 font-sans text-slate-800">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+                {currentContent.title}
+              </h1>
+              <p className="text-sm text-slate-500 mt-1">
+                {currentContent.subtitle}
+              </p>
+            </div>
+            <button className="self-start sm:self-auto bg-amber-800 hover:bg-amber-800 text-white px-4 py-2.5 rounded-xl font-medium text-sm transition shadow-sm hover:shadow flex items-center gap-2">
+              <ShoppingBag className="w-4 h-4" /> Start Shopping
+            </button>
+          </div>
+
+          {children}
+        </main>
+
+        {/* Mobile Horizontal Navigation Tabs */}
+        <div className="lg:hidden pb-2 w-[95%] sticky bottom-0 mx-auto">
+          <nav className="flex items-center justify-around gap-2 min-w-max p-1.5 bg-white rounded-2xl border border-slate-200/80 shadow-sm">
+            {menuItems.map((item) => {
+              const Icon = item.icon;
+              const active = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                    active
+                      ? "bg-rose-900 text-white shadow-sm"
+                      : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900"
+                  }`}
+                >
+                  <Icon size={16} />
+                  <span className={`hidden md:inline`}>{item.label}</span>
+                </Link>
+              );
+            })}
+            <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all text-slate-600 hover:bg-slate-100/80 hover:text-slate-900">
+              <LogOut size={16} />
+              <span className={`hidden md:inline`}>Logout</span>
+            </button>
+          </nav>
+        </div>
       </div>
 
       <ScrollToTop />
       <Footer />
-    </>
+    </div>
   );
 }
