@@ -145,7 +145,7 @@ export default function CreateProductModal({
         sku: `${product.slug}-${color}-${size}`
           .toUpperCase()
           .replace(/\s+/g, "-"),
-      }))
+      })),
     );
     setVariants(generated);
   };
@@ -216,7 +216,7 @@ export default function CreateProductModal({
         setProducts((prev: any[]) => {
           if (isEditMode) {
             return prev.map((p) =>
-              p._id === editingProduct._id ? res.data.data : p
+              p._id === editingProduct._id ? res.data.data : p,
             );
           }
           return [res.data.data, ...prev];
@@ -239,8 +239,8 @@ export default function CreateProductModal({
         className="bg-white w-full max-w-7xl rounded-2xl shadow-2xl overflow-hidden grid lg:grid-cols-3 max-h-[90vh] relative"
       >
         {/* LEFT COLUMN - CONTENT AREA */}
-        <div className="lg:col-span-2 p-6 sm:p-8 space-y-8 overflow-y-auto max-h-[45vh] lg:max-h-[90vh]">
-          <div className="flex items-center justify-between border-b pb-4">
+        <div className="lg:col-span-2 p-6 sm:p-8 space-y-3 overflow-y-auto max-h-[45vh] lg:max-h-[90vh]">
+          <div className="flex items-center justify-between border-b border-slate-200 pb-4">
             <h1 className="text-2xl font-bold text-[#800000]">
               {isEditMode ? "Edit Product" : "Create Product"}
             </h1>
@@ -250,7 +250,7 @@ export default function CreateProductModal({
           </div>
 
           {/* BASIC INFO */}
-          <div className="bg-gray-50 p-6 rounded-2xl space-y-4 shadow-sm border border-gray-100">
+          <div className="bg-gray-50 p-6 rounded-md space-y-4 border border-gray-100">
             <h2 className="font-semibold text-gray-800 text-lg">Basic Info</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               <input
@@ -278,7 +278,7 @@ export default function CreateProductModal({
                 disabled={isSubmitting}
                 className="border-b border-gray-300 focus:border-[#800000] focus:outline-none py-1.5 text-gray-700 bg-transparent transition disabled:opacity-50"
               >
-                <option value="">Select Brand</option>
+                <option value="">Select Sub Category</option>
                 {brands.map((c: any) => (
                   <option key={c._id} value={c._id}>
                     {c.name}
@@ -330,7 +330,7 @@ export default function CreateProductModal({
           </div>
 
           {/* ATTRIBUTES */}
-          <div className="bg-gray-50 p-6 rounded-2xl space-y-5 shadow-sm border border-gray-100">
+          <div className="bg-gray-50 p-6 rounded-md space-y-5 border border-gray-100">
             <h2 className="font-semibold text-gray-800 text-lg">Attributes</h2>
 
             {/* SIZE */}
@@ -350,7 +350,7 @@ export default function CreateProductModal({
                       addAttribute("size", sizeInput, setSizeInput);
                     }
                   }}
-                  className="border rounded-lg px-3 py-1.5 flex-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#800000] disabled:opacity-50"
+                  className="border border-slate-300 rounded-lg px-3 py-1.5 flex-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#800000] disabled:opacity-50"
                 />
                 <button
                   type="button"
@@ -392,7 +392,7 @@ export default function CreateProductModal({
                       addAttribute("color", colorInput, setColorInput);
                     }
                   }}
-                  className="border rounded-lg px-3 py-1.5 flex-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#800000] disabled:opacity-50"
+                  className="border border-slate-300 rounded-lg px-3 py-1.5 flex-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#800000] disabled:opacity-50"
                 />
                 <button
                   type="button"
@@ -517,7 +517,9 @@ export default function CreateProductModal({
                       Product Images
                     </label>
 
-                    <label className={`block border-2 border-dashed border-gray-300 rounded-xl p-5 text-center transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:border-[#800000] hover:bg-amber-50/20"}`}>
+                    <label
+                      className={`block border-2 border-dashed border-gray-300 rounded-xl p-5 text-center transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:border-[#800000] hover:bg-amber-50/20"}`}
+                    >
                       <input
                         type="file"
                         multiple
@@ -546,7 +548,7 @@ export default function CreateProductModal({
                                 updated[i] = {
                                   ...updated[i],
                                   images: updated[i].images.filter(
-                                    (_: string, index: number) => index !== idx
+                                    (_: string, index: number) => index !== idx,
                                   ),
                                 };
                                 return updated;
@@ -576,7 +578,7 @@ export default function CreateProductModal({
                                   pendingImages: updated[
                                     i
                                   ].pendingImages.filter(
-                                    (_: File, index: number) => index !== idx
+                                    (_: File, index: number) => index !== idx,
                                   ),
                                 };
                                 return updated;
@@ -602,7 +604,7 @@ export default function CreateProductModal({
             <h3 className="lg:text-lg font-bold border-b border-white/20 pb-2">
               Product Settings
             </h3>
-            
+
             <div className="space-y-2 lg:space-y-4">
               <label className="flex items-center gap-3 cursor-pointer select-none">
                 <input
@@ -662,9 +664,25 @@ export default function CreateProductModal({
             >
               {isSubmitting ? (
                 <>
-                  <svg className="animate-spin h-5 w-5 text-[#800000]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin h-5 w-5 text-[#800000]"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                   <span>{isEditMode ? "Updating..." : "Creating..."}</span>
                 </>

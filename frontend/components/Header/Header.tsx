@@ -6,6 +6,7 @@ import Image from "next/image";
 
 import { useCartStore } from "@/store/cart.store";
 import { useWishlistStore } from "@/store/wishlist.store";
+import { useAuthStore } from "@/store/auth.store";
 
 import {
   Search,
@@ -22,7 +23,6 @@ import {
 
 import WebWrapper from "../Wrapper/webWrapper";
 import { navbarData } from "./HeaderData";
-
 
 // Dynamic Navigation & Mega Menu Data
 const categoriesMegaMenu = [
@@ -69,8 +69,12 @@ const trendingSearches = [
 ];
 
 export default function NextGenNavbar() {
-  const getTotalCartItems = useCartStore((state) => state.getTotalItems);
-  const cartItemCount = getTotalCartItems();
+  const { user, isAuthenticated } = useAuthStore();
+
+  const cartItemCount = useCartStore((state) =>
+    state.cart.reduce((sum, item) => sum + item.quantity, 0),
+  );
+
   const getTotalWishlistItems = useWishlistStore((state) => state.wishlist);
 
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
@@ -245,11 +249,12 @@ export default function NextGenNavbar() {
           <div className="flex items-center gap-2 sm:gap-4">
             {/* Account */}
             <Link
-              href="/user/dashboard"
-              className="p-2.5 text-neutral-700 hover:text-amber-900 hover:bg-amber-50 rounded-full transition-all"
+              href={user?.id && isAuthenticated ? "/user/dashboard" : "/signin" }
+              className={`p-2.5 text-neutral-700 hover:text-amber-900 hover:bg-amber-50 rounded-full transition-all ${user?.id && isAuthenticated ? "bg-amber-700 text-white" : "" }`}
               aria-label="Account"
             >
-              <User className="w-5 h-5" />
+              {user?.id && isAuthenticated ? <p className="size-5 flex justify-center items-center text-xl font-black">{ user.name.charAt(0)}</p> : <User className="w-5 h-5" /> }
+              
             </Link>
 
             {/* Wishlist Button */}
@@ -285,7 +290,7 @@ export default function NextGenNavbar() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className="xl:hidden p-2 text-neutral-700 hover:text-amber-900 transition-colors"
+              className="xl:hidden p-2 text-neutral-700 hover:text-amber-900 transition-colors cursor-pointer"
               aria-label="Open Mobile Menu"
             >
               <Menu className="w-6 h-6" />
@@ -369,7 +374,7 @@ export default function NextGenNavbar() {
                 <span className="font-bold text-lg text-neutral-900">Menu</span>
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-2 text-neutral-500 hover:text-neutral-900 transition-colors"
+                  className="p-2 text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -404,7 +409,7 @@ export default function NextGenNavbar() {
             {/* Mobile Footer Meta Actions */}
             <div className="border-t border-neutral-100 pt-6 space-y-3">
               <Link
-                href="/account"
+                href={user?.id && isAuthenticated ? "/user/dashboard" : "/signin" }
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="w-full flex items-center justify-center gap-2 py-2.5 bg-neutral-100 text-neutral-800 font-semibold rounded-xl text-sm hover:bg-neutral-200 transition-colors"
               >

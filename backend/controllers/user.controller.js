@@ -166,7 +166,7 @@ exports.updateUser = async (req, res, next) => {
   }
 };
 
-// user route 
+// user route
 exports.getAddresses = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -178,9 +178,7 @@ exports.getAddresses = async (req, res) => {
       });
     }
 
-    const user = await User.findById(userId).select(
-      "addresses phone",
-    );
+    const user = await User.findById(userId).select("addresses phone");
 
     if (!user) {
       return res.status(404).json({
@@ -216,7 +214,7 @@ exports.addAddress = async (req, res) => {
 
   // if user sets default → unset others
   if (newAddress.isDefault) {
-    user.addresses.forEach(a => (a.isDefault = false));
+    user.addresses.forEach((a) => (a.isDefault = false));
   }
 
   user.addresses.push(newAddress);
@@ -241,7 +239,7 @@ exports.updateAddress = async (req, res) => {
 
   // if this becomes default → unset others
   if (req.body.isDefault) {
-    user.addresses.forEach(a => {
+    user.addresses.forEach((a) => {
       a.isDefault = a._id.toString() === addressId;
     });
   }
@@ -255,25 +253,26 @@ exports.deleteAddress = async (req, res) => {
   const { addressId } = req.params;
 
   const user = await User.findById(req.user.id);
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
 
   const address = user.addresses.id(addressId);
 
   if (!address) {
-    return res.status(404).json({ message: "Not found" });
+    return res.status(404).json({ message: "Address not found" });
   }
-
+  
   const wasDefault = address.isDefault;
 
-  address.remove();
+  address.deleteOne();
 
-  // if deleted default → assign first address as default
   if (wasDefault && user.addresses.length > 0) {
     user.addresses[0].isDefault = true;
   }
-
   await user.save();
 
-  res.json({ success: true });
+  res.json({ success: true, addresses: user.addresses });
 };
 
 exports.setDefaultAddress = async (req, res) => {
@@ -293,23 +292,26 @@ exports.setDefaultAddress = async (req, res) => {
 // public routes
 exports.register = async (req, res, next) => {
   try {
-    const { name, email, password, confirmPassowrd, phone } = req.body;
+    const { name, email, password, confirmPassword, phone } = req.body;
 
     if (!name || !email || !password || !phone) {
       return res.status(400).json({
         success: false,
-        message: "Name, email, password and phone are required",
+        message: "Name, email, password, and phone are required",
       });
     }
 
-    if (password != confirmPassowrd) {
+    if (password !== confirmPassword) {
       return res.status(400).json({
         success: false,
-        message: "password and confirm password didnot match",
+        message: "Password and confirm password did not match",
       });
     }
 
-    if (!validator.isEmail(email)) {
+    // Normalize email to prevent case-sensitivity bypass
+    const normalizedEmail = email.toLowerCase().trim();
+
+    if (!validator.isEmail(normalizedEmail)) {
       return res.status(400).json({
         success: false,
         message: "Invalid email format",
@@ -317,7 +319,7 @@ exports.register = async (req, res, next) => {
     }
 
     const existingUser = await User.findOne({
-      $or: [{ email, phone }],
+      $or: [{ email: normalizedEmail }, { phone }],
     });
 
     if (existingUser) {
@@ -331,7 +333,7 @@ exports.register = async (req, res, next) => {
 
     const user = await User.create({
       name,
-      email,
+      email: normalizedEmail,
       phone,
       passwordHash: hashedPassword,
     });
@@ -347,6 +349,15 @@ exports.register = async (req, res, next) => {
       data: responseUser,
     });
   } catch (error) {
+    // Catch MongoDB duplicate key error (E11000)
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyValue)[0];
+      return res.status(400).json({
+        success: false,
+        message: `${field.charAt(0).toUpperCase() + field.slice(1)} is already registered`,
+      });
+    }
+
     next(error);
   }
 };
@@ -399,9 +410,30 @@ exports.login = async (req, res, next) => {
           _id: user._id,
           name: user.name,
           email: user.email,
-          role :user.isAdmin ? 'riven' : 'user'
+          role: user.isAdmin ? "riven" : "user",
         },
       },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// controllers/authController.js
+
+exports.logout = async (req, res, next) => {
+  try {
+    // 1. Clear HTTP-Only authentication cookie (if stored in cookies)
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+    });
+
+    // 2. Return success status
+    res.status(200).json({
+      success: true,
+      message: "Successfully logged out",
     });
   } catch (error) {
     next(error);

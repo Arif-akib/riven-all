@@ -1,14 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { User, Mail, PhoneCall, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
+
+import {
+  User,
+  Mail,
+  PhoneCall,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Loader,
+} from "lucide-react";
+
+import API from "@/lib/axios";
+import toast from "react-hot-toast";
+import { useAuthStore } from "@/store/auth.store";
 
 export default function RegisterForm() {
+  const router = useRouter();
+  const { setUser } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  
+  const [loading, setLoading] = useState(false);
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -26,9 +43,65 @@ export default function RegisterForm() {
     }));
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleLogin = async (e: any) => {
     e.preventDefault();
-    // Handle registration logic here
+
+    try {
+      setLoading(true);
+
+      const res = await API.post("/user/login", form);
+
+      if (!res.data.success) {
+        toast.error("Login failed");
+        return;
+      }
+
+      const user = res.data.data.user;
+
+      const userData = {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      };
+
+      setUser(userData);
+
+      const role = user.role;
+      if (role == "riven") {
+        router.push("/admin/dashboard");
+      } else {
+        router.push("/user/dashboard");
+      }
+    } catch (err) {
+      toast.error("Login failed");
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const res = await API.post("/user/register", form);
+
+      if (res.data.success) {
+        toast.success("Registered successfully!");
+        handleLogin(e);
+      }
+    } catch (err: any) {
+      // Axios attaches response data under err.response
+      const errorMessage =
+        err.response?.data?.message || "An unexpected error occurred";
+
+      toast.error(errorMessage);
+      console.log(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -50,7 +123,10 @@ export default function RegisterForm() {
             Full Name
           </label>
           <div className="relative flex items-center">
-            <User size={16} className="absolute left-3.5 text-slate-400 pointer-events-none" />
+            <User
+              size={16}
+              className="absolute left-3.5 text-slate-400 pointer-events-none"
+            />
             <input
               onChange={handleChange}
               value={form.name}
@@ -70,7 +146,10 @@ export default function RegisterForm() {
               Email
             </label>
             <div className="relative flex items-center">
-              <Mail size={16} className="absolute left-3.5 text-slate-400 pointer-events-none" />
+              <Mail
+                size={16}
+                className="absolute left-3.5 text-slate-400 pointer-events-none"
+              />
               <input
                 onChange={handleChange}
                 value={form.email}
@@ -88,7 +167,10 @@ export default function RegisterForm() {
               Phone
             </label>
             <div className="relative flex items-center">
-              <PhoneCall size={16} className="absolute left-3.5 text-slate-400 pointer-events-none" />
+              <PhoneCall
+                size={16}
+                className="absolute left-3.5 text-slate-400 pointer-events-none"
+              />
               <input
                 onChange={handleChange}
                 value={form.phone}
@@ -109,7 +191,10 @@ export default function RegisterForm() {
               Password
             </label>
             <div className="relative flex items-center">
-              <Lock size={16} className="absolute left-3.5 text-slate-400 pointer-events-none" />
+              <Lock
+                size={16}
+                className="absolute left-3.5 text-slate-400 pointer-events-none"
+              />
               <input
                 onChange={handleChange}
                 value={form.password}
@@ -135,7 +220,10 @@ export default function RegisterForm() {
               Confirm Password
             </label>
             <div className="relative flex items-center">
-              <Lock size={16} className="absolute left-3.5 text-slate-400 pointer-events-none" />
+              <Lock
+                size={16}
+                className="absolute left-3.5 text-slate-400 pointer-events-none"
+              />
               <input
                 onChange={handleChange}
                 value={form.confirmPassword}
@@ -166,11 +254,14 @@ export default function RegisterForm() {
               checked={form.agreeToTerms}
               onChange={handleChange}
               required
-              className="h-4 w-4 rounded border-slate-300 text-rose-900 focus:ring-rose-900/20 transition"
+              className="h-4 w-4 rounded border-slate-300 text-rose-900 focus:ring-rose-900/20 transition accent-amber-700 cursor-pointer"
             />
             <span className="text-xs text-slate-600">
               I agree to the{" "}
-              <Link href="/terms" className="text-rose-900 font-medium underline-offset-2 hover:underline">
+              <Link
+                href="/terms"
+                className="text-rose-900 font-medium underline-offset-2 hover:underline"
+              >
                 Terms & Conditions
               </Link>
             </span>
@@ -180,10 +271,17 @@ export default function RegisterForm() {
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-rose-950 via-rose-900 to-rose-800 text-white font-medium text-xs sm:text-sm shadow-md shadow-rose-950/10 hover:shadow-lg hover:shadow-rose-950/20 transition-all flex items-center justify-center gap-2 group mt-2"
+          disabled={loading}
+          className="w-full py-2.5 px-4 rounded-xl bg-linear-to-r from-rose-950 via-rose-900 to-rose-800 text-white font-medium text-xs sm:text-sm shadow-md shadow-rose-950/10 hover:shadow-lg hover:shadow-rose-950/20 transition-all flex items-center justify-center gap-2 group mt-2 cursor-pointer"
         >
-          <span>Create Account</span>
-          <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
+          {loading && <Loader size={15} className="animate-spin" />}
+          <span>{loading ? "Creating Account" : "Create Account"}</span>
+          {!loading && (
+            <ArrowRight
+              size={15}
+              className="transition-transform group-hover:translate-x-1"
+            />
+          )}
         </button>
       </form>
     </div>

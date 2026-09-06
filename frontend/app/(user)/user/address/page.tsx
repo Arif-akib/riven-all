@@ -178,6 +178,10 @@ export default function AddressPage() {
   // ---------------- DELETE ----------------
   const confirmDelete = async () => {
     if (!deleteId) return;
+    if (addresses.length < 2) {
+      toast.error("You must have at least 1 address")
+      return
+    }
 
     try {
       await API.delete(`/user/customer/address/${deleteId}`);
@@ -251,14 +255,14 @@ export default function AddressPage() {
               <div className="flex gap-2 mt-5 relative">
                 <button
                   onClick={() => openEdit(addr)}
-                  className="flex-1 px-3 py-2 text-sm rounded-xl border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 transition font-medium"
+                  className="flex-1 px-3 py-2 text-sm rounded-xl border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 transition font-medium cursor-pointer"
                 >
                   Edit
                 </button>
 
                 <button
                   onClick={() => setDeleteId(addr._id)}
-                  className="flex-1 px-3 py-2 text-sm rounded-xl border border-red-100 text-red-600 hover:bg-red-50 hover:border-red-200 transition font-medium"
+                  className="flex-1 px-3 py-2 text-sm rounded-xl border border-red-100 text-red-600 hover:bg-red-50 hover:border-red-200 transition font-medium cursor-pointer"
                 >
                   Delete
                 </button>
@@ -321,14 +325,14 @@ export default function AddressPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => setDeleteId(null)}
-                className="flex-1 px-3 py-2 border rounded-lg"
+                className="flex-1 px-3 py-2 border border-slate-300 rounded-lg cursor-pointer"
               >
                 Cancel
               </button>
 
               <button
                 onClick={confirmDelete}
-                className="flex-1 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                className="flex-1 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 cursor-pointer"
               >
                 Delete
               </button>

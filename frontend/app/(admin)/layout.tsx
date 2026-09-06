@@ -7,7 +7,7 @@ import {
   FolderTree,
   ShoppingBag,
   Users,
-  ListTree  ,
+  ListTree,
   Layers,
   Settings,
   LogOut,
@@ -17,6 +17,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuthStore } from "@/store/auth.store";
+import toast from "react-hot-toast";
+import API from "@/lib/axios";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -26,6 +29,10 @@ export default function AdminLayout({ children }: Readonly<AdminLayoutProps>) {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const clearAuth = useAuthStore.getState().clearAuth;
+  const user = useAuthStore.getState().user;
+
+  const [loading, setLoading] = useState(false);
 
   const menuItems = [
     {
@@ -40,7 +47,7 @@ export default function AdminLayout({ children }: Readonly<AdminLayoutProps>) {
     },
     {
       label: "Sub-Categories",
-      icon: <ListTree   size={20} />,
+      icon: <ListTree size={20} />,
       href: "/admin/sub-category",
     },
     {
@@ -70,6 +77,23 @@ export default function AdminLayout({ children }: Readonly<AdminLayoutProps>) {
     },
   ];
 
+  const handleLogout = async () => {
+    setLoading(true);
+    try {
+      await API.post("/user/logout");
+      toast.success("Logged out successfully");
+    } catch (err: any) {
+      const message = err.response?.data?.message || "Logout failed on server";
+      console.error(message);
+    } finally {
+      clearAuth();
+      localStorage.removeItem("auth-storage");
+      localStorage.removeItem("token");
+      window.location.href = "/signin";
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="h-screen overflow-y-auto bg-slate-50 text-slate-800 flex flex-col md:flex-row relative overflow-x-hidden">
       {/* MOBILE OVERLAY */}
@@ -93,7 +117,7 @@ export default function AdminLayout({ children }: Readonly<AdminLayoutProps>) {
         {/* Toggle Button for Desktop */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="hidden md:flex absolute -right-3 top-7 bg-white border border-slate-200 text-slate-600 hover:text-rose-900 rounded-full p-1 shadow-sm transition-transform duration-300"
+          className="hidden md:flex absolute -right-3 top-7 bg-white border border-slate-200 text-slate-600 hover:text-rose-900 rounded-full p-1 shadow-sm transition-transform duration-300 cursor-pointer"
           aria-label="Toggle Sidebar"
         >
           <ChevronLeft
@@ -110,21 +134,21 @@ export default function AdminLayout({ children }: Readonly<AdminLayoutProps>) {
             isCollapsed ? "justify-center" : ""
           }`}
         >
-          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-rose-900 to-red-600 text-white font-bold flex items-center justify-center shrink-0 shadow-md">
-            A
+          <div className="w-10 h-10 rounded-full bg-linear-to-tr from-rose-900 to-red-600 text-white font-bold flex items-center justify-center shrink-0 shadow-md uppercase">
+            {user?.name.charAt(0)}
           </div>
           {!isCollapsed && (
             <div className="overflow-hidden flex-1 min-w-0">
-              <p className="font-semibold text-sm text-slate-900 truncate">
-                Arif Akib
+              <p className="font-semibold text-sm text-slate-900 truncate capitalize">
+                {user?.name}
               </p>
-              <p className="text-xs text-slate-500 truncate">a@gmail.com</p>
+              <p className="text-xs text-slate-500 truncate">{user?.email}</p>
             </div>
           )}
           {/* Mobile Close Button */}
           <button
             onClick={() => setIsMobileOpen(false)}
-            className="md:hidden text-slate-500 hover:text-slate-800 ml-auto"
+            className="md:hidden text-slate-500 hover:text-slate-800 ml-auto cursor-pointer"
           >
             <X size={20} />
           </button>
@@ -153,9 +177,7 @@ export default function AdminLayout({ children }: Readonly<AdminLayoutProps>) {
                 <span className={isActive ? "text-white" : "text-slate-400"}>
                   {item.icon}
                 </span>
-                {!isCollapsed && (
-                  <span className="truncate">{item.label}</span>
-                )}
+                {!isCollapsed && <span className="truncate">{item.label}</span>}
               </Link>
             );
           })}
@@ -166,7 +188,9 @@ export default function AdminLayout({ children }: Readonly<AdminLayoutProps>) {
           <button
             type="button"
             title={isCollapsed ? "Logout" : undefined}
-            className={`flex items-center gap-3 px-3 py-2.5 w-full rounded-lg text-sm font-medium text-rose-700 hover:bg-rose-50 transition-colors ${
+            disabled={loading}
+            onClick={handleLogout}
+            className={`flex items-center gap-3 px-3 py-2.5 w-full rounded-lg text-sm font-medium text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer ${
               isCollapsed ? "justify-center" : ""
             }`}
           >
@@ -183,12 +207,16 @@ export default function AdminLayout({ children }: Readonly<AdminLayoutProps>) {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsMobileOpen(true)}
-              className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg"
+              className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer"
               aria-label="Open sidebar"
             >
               <Menu size={20} />
             </button>
-            <span className="font-semibold text-slate-900">Admin Panel</span>
+            <div>
+              <span className="font-semibold text-slate-900 block">
+                {user?.name}
+              </span>
+            </div>
           </div>
         </div>
 

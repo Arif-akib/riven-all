@@ -305,7 +305,7 @@ exports.placeOrder = async (req, res, next) => {
 exports.getMyOrders = async (req, res, next) => {
   try {
     const orders = await Order.find({
-      userId: req.user.id,
+      user: req.user.id,
     }).sort({ createdAt: -1 });
 
     return res.status(200).json({
@@ -318,7 +318,7 @@ exports.getMyOrders = async (req, res, next) => {
   }
 };
 
-// use both for user and admin
+//view order details use both for user and admin 
 exports.getOrder = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -360,7 +360,7 @@ exports.updateOrder = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const { orderStatus, paymentStatus, note, customerInfo } = req.body;
+    const { orderStatus, paymentStatus } = req.body;
 
     const order = await Order.findById(id);
 
@@ -378,17 +378,6 @@ exports.updateOrder = async (req, res, next) => {
 
     if (paymentStatus !== undefined) {
       order.paymentStatus = paymentStatus;
-    }
-
-    if (note !== undefined) {
-      order.note = note;
-    }
-
-    if (customerInfo !== undefined) {
-      order.customerInfo = {
-        ...order.customerInfo,
-        ...customerInfo,
-      };
     }
 
     await order.save();

@@ -6,6 +6,7 @@ const { authorizeAdmin } = require("../middlewares/admin.middleware");
 const {
   register,
   login,
+  logout,
 
   getUsers,
   createUser,
@@ -21,6 +22,7 @@ const {
 // PUBLIC
 router.post("/register", register);
 router.post("/login", login);
+router.post("/logout", logout);
 
 // ADMIN ONLY
 router.use("/admin", authenticate, authorizeAdmin);

@@ -105,7 +105,7 @@ export default function ShopPageComponent() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await API.get("/subcategory/admin/list");
+        const res = await API.get("/subcategory/list");
         setBrandList(res.data.data || res.data);
       } catch (error) {
         console.error("Failed to fetch subcategories:", error);
@@ -143,7 +143,7 @@ export default function ShopPageComponent() {
 
               <button
                 onClick={() => setOpen(false)}
-                className="xl:hidden text-amber-800"
+                className="xl:hidden text-amber-800 cursor-pointer"
               >
                 ✕
               </button>
@@ -159,7 +159,7 @@ export default function ShopPageComponent() {
                     setPage(1);
                     setOnSale(undefined);
                   }}
-                  className="text-xs text-gray-500 hover:text-[#800000]"
+                  className="text-xs text-gray-500 hover:text-[#800000] cursor-pointer"
                 >
                   Clear
                 </button>
@@ -207,7 +207,7 @@ export default function ShopPageComponent() {
                     setPage(1);
                     setSelectedBrand('');
                   }}
-                  className="text-xs text-gray-500 hover:text-[#800000]"
+                  className="text-xs text-gray-500 hover:text-[#800000] cursor-pointer"
                 >
                   Clear
                 </button>
@@ -242,7 +242,7 @@ export default function ShopPageComponent() {
 
               <button
                 onClick={() => setOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 border border-[#800000] text-[#800000] rounded-md"
+                className="flex items-center gap-2 px-4 py-2 border border-[#800000] text-[#800000] rounded-md cursor-pointer"
               >
                 <SlidersHorizontal size={16} />
                 Filters

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist , createJSONStorage } from "zustand/middleware";
 
 /**
  * Cart Item Type
@@ -176,6 +176,7 @@ export const useCartStore = create<CartStore>()(
 
     {
       name: "cart-storage",
+      storage: createJSONStorage(() => localStorage),
     },
   ),
 );

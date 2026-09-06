@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Loader } from "lucide-react";
 import toast from "react-hot-toast";
 import API from "@/lib/axios";
+import { useAuthStore } from "@/store/auth.store";
 
 export default function SignInComponent() {
+  const { setUser } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -36,16 +38,26 @@ export default function SignInComponent() {
         return;
       }
 
-      const role = res.data.data.user.role;
-      if (role == 'riven') {
-        router.push('/admin/dashboard')
+      const user = res.data.data.user;
+
+      const userData = {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      };
+
+      setUser(userData);
+
+      const role = user.role;
+      if (role == "riven") {
+        router.push("/admin/dashboard");
       } else {
-        router.push('/user/dashboard')
-        
+        router.push("/user/dashboard");
       }
     } catch (err) {
       toast.error("Login failed");
-      console.log(err)
+      console.log(err);
     } finally {
       setLoading(false);
     }
@@ -121,37 +133,11 @@ export default function SignInComponent() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 rounded-lg bg-[#800020] text-white font-semibold hover:bg-[#650018] transition active:scale-95"
+          className="w-full py-3 rounded-lg bg-[#800020] text-white font-semibold hover:bg-[#650018] transition active:scale-95 cursor-pointer flex justify-center items-center gap-2"
         >
+          {loading && <Loader size={15} className="animate-spin"/>}
           {loading ? "Signing In..." : "Sign In"}
         </button>
-
-        {/* Divider */}
-        {/* <div className="flex items-center gap-3">
-          <div className="flex-1 h-px bg-gray-200"></div>
-          <span className="text-sm text-gray-400">OR</span>
-          <div className="flex-1 h-px bg-gray-200"></div>
-        </div> */}
-
-        {/* Social Login */}
-        {/* <button className="flex items-center justify-center gap-3 w-full py-2.5 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition font-medium text-gray-700">
-          <img
-            src="https://www.svgrepo.com/show/475656/google-color.svg"
-            alt="Google"
-            className="w-5 h-5"
-          />
-          Continue with Google
-        </button> */}
-
-        {/* <p className="text-center text-sm text-gray-500">
-          Don't have an account?{" "}
-          <Link
-            href="/signup"
-            className="text-[#800020] font-semibold hover:underline"
-          >
-            Sign up
-          </Link>
-        </p> */}
       </form>
     </>
   );

@@ -9,6 +9,9 @@ const {
   validateCart,
   placeOrder,
   getOrders,
+  getMyOrders,
+
+  updateOrder
 } = require("../controllers/order.controller");
 
 // public
@@ -17,11 +20,12 @@ router.post("/cart/validate", validateCart);
 // user only
 router.use("/customer", authenticate);
 router.post("/customer/place-order", placeOrder);
-// router.get("/customer/my-orders", authenticate, getMyOrders);
-// router.get("/customer/my-orders/:id", authenticate, getOrder);
+router.get("/customer/my-orders", getMyOrders);
+// router.get("/customer/my-orders/:id", getOrder);
 
-router.get("/admin/all-orders", authenticate, authorizeAdmin, getOrders);
-// router.get("/admin/order/:id", authenticate, authorizeAdmin, getOrder);
-// router.put("/admin/order/:id", authenticate, authorizeAdmin, updateOrder);
+router.use("/admin", authenticate, authorizeAdmin);
+router.get("/admin/all-orders", getOrders);
+router.put("/admin/order/:id", updateOrder);
+// router.get("/admin/order/:id", getOrder);
 
 module.exports = router;

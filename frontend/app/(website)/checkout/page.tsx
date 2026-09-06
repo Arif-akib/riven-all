@@ -356,7 +356,7 @@ export default function CheckoutPage() {
             >
               Place Order
             </button>
-            <Link href="/shop">
+            <Link href="/cart">
               <button className="mt-3 w-full border py-3 rounded-xl text-amber-900 cursor-pointer">
                 Back To Cart
               </button>

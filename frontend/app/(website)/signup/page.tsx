@@ -5,7 +5,7 @@ export default function SignUpPage() {
  
 
   return (
-    <div className="flex items-center justify-center px-5 pt-10">
+    <div className="flex items-center justify-center p-5 min-h-[70vh]">
       <div className="w-full max-w-3xl grid md:grid-cols-2 bg-white/10 backdrop-blur-xl border border-red-400/20 rounded-3xl shadow-2xl overflow-hidden">
         {/* Left Side */}
         <div className="flex flex-col justify-center p-6 sm:p-8 text-white bg-linear-to-br from-[#800020] to-[#3b000f]">

@@ -16,7 +16,7 @@ type ProductCardProps = {
 
 export default function ProductCard({ item }: ProductCardProps) {
   const { toggleWishlist, isInWishlist } = useWishlistStore();
-  const isWishlisted = isInWishlist(item._id,);
+  const isWishlisted = isInWishlist(item._id);
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -87,7 +87,7 @@ export default function ProductCard({ item }: ProductCardProps) {
           {/* Add to Cart Button */}
           <button
             onClick={() => setOpen(true)}
-            className="relative px-5 py-2 text-sm font-semibold rounded-full bg-linear-to-r from-[#800000] to-[#b30000] text-white shadow-md shadow-red-900/30 hover:shadow-lg hover:shadow-red-900/50 hover:scale-[1.03] active:scale-[0.97] transition-all duration-300 overflow-hidden group"
+            className="relative px-5 py-2 text-sm font-semibold rounded-full bg-linear-to-r from-[#800000] to-[#b30000] text-white shadow-md shadow-red-900/30 hover:shadow-lg hover:shadow-red-900/50 hover:scale-[1.03] active:scale-[0.97] transition-all duration-300 overflow-hidden group cursor-pointer"
           >
             {/* Glow effect */}
             <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition rounded-full"></span>
@@ -100,14 +100,19 @@ export default function ProductCard({ item }: ProductCardProps) {
           {/* Action Buttons */}
           <div className="flex gap-3">
             {/* View Button */}
-            <button className="p-2 rounded-full bg-white/70 backdrop-blur-md border border-gray-200 shadow-sm hover:shadow-md hover:bg-amber-800 hover:text-white hover:scale-110 active:scale-95 transition-all duration-300">
+            <Link href={`/shop/${item?.id}`} className="p-2 rounded-full bg-white/70 backdrop-blur-md border border-gray-200 shadow-sm hover:shadow-md hover:bg-amber-800 hover:text-white hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer">
               <Eye className="size-4" />
-            </button>
+            </Link>
 
             {/* Wishlist Button */}
-            <button onClick={()=>toggleWishlist(item)} className={`p-2 rounded-full backdrop-blur-md border shadow-sm hover:shadow-md hover:bg-amber-700 hover:text-white hover:scale-110 active:scale-95 transition-all duration-300 ${isWishlisted
-        ? "bg-amber-700 text-white border-amber-700"
-        : "bg-white/70 border-gray-200"}`}>
+            <button
+              onClick={() => toggleWishlist(item)}
+              className={`p-2 rounded-full backdrop-blur-md border shadow-sm hover:shadow-md hover:bg-amber-700 hover:text-white hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer ${
+                isWishlisted
+                  ? "bg-amber-700 text-white border-amber-700"
+                  : "bg-white/70 border-gray-200"
+              }`}
+            >
               <Heart className="size-4" />
             </button>
           </div>
@@ -118,13 +123,6 @@ export default function ProductCard({ item }: ProductCardProps) {
         open={open}
         onClose={() => setOpen(false)}
         productId={item.id}
-        // onAddToCart={(variant, quantity) => {
-        //   addToCart({
-        //     productId: item.id,
-        //     variantId: variant.id,
-        //     quantity,
-        //   });
-        // }}
       />
     </>
   );

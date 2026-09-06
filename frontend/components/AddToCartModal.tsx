@@ -99,7 +99,7 @@ export default function AddToCartModal({ open, onClose, productId }: Props) {
 
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-gray-100 transition"
+            className="p-2 rounded-full hover:bg-red-600 hover:text-white transition cursor-pointer"
           >
             <X className="size-5" />
           </button>
@@ -199,7 +199,7 @@ export default function AddToCartModal({ open, onClose, productId }: Props) {
 
                       setQuantity(existing?.quantity || 1);
                     }}
-                    className={`px-4 py-2 rounded-xl border text-xs font-medium transition ${
+                    className={`px-4 py-2 rounded-xl border text-xs font-medium transition cursor-pointer ${
                       selectedVariantIndex === i
                         ? "bg-[#800000] text-white border-[#800000]"
                         : "border-gray-300"
@@ -218,7 +218,7 @@ export default function AddToCartModal({ open, onClose, productId }: Props) {
               <div className="flex items-center w-fit rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="px-4 py-1.5 text-lg font-semibold text-gray-600 hover:bg-gray-100 active:scale-95 transition"
+                  className="px-4 py-1.5 text-lg font-semibold text-gray-600 hover:bg-gray-100 active:scale-95 transition cursor-pointer"
                 >
                   −
                 </button>
@@ -231,7 +231,7 @@ export default function AddToCartModal({ open, onClose, productId }: Props) {
                   onClick={() =>
                     setQuantity((q) => (activeVariant ? Math.min(q + 1) : q))
                   }
-                  className="px-4 py-1.5 text-lg font-semibold text-gray-600 hover:bg-gray-100 active:scale-95 transition"
+                  className="px-4 py-1.5 text-lg font-semibold text-gray-600 hover:bg-gray-100 active:scale-95 transition cursor-pointer"
                 >
                   +
                 </button>
@@ -242,7 +242,7 @@ export default function AddToCartModal({ open, onClose, productId }: Props) {
             <button
               onClick={handleAddToCart}
               disabled={!activeVariant}
-              className="w-full mt-8 bg-linear-to-r from-[#800000] to-[#b30000] text-white py-2 rounded-xl font-semibold flex items-center justify-center gap-2 transition hover:opacity-90 disabled:opacity-50"
+              className="w-full mt-8 bg-linear-to-r from-[#800000] to-[#b30000] text-white py-2 rounded-xl font-semibold flex items-center justify-center gap-2 transition hover:opacity-90 disabled:opacity-50 cursor-pointer"
             >
               <ShoppingCart className="size-5" />
               Add To Cart
